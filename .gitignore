@@ -1,0 +1,8 @@
+all-manus-erp-igreja/
+all-manus-erp-igreja.zip
+erp-igreja-backend/
+erp-igreja-backend.zip
+node_modules/
+dist/
+.env
+.qodo

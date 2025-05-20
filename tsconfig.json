@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                  // Atualizado para ES2020
+    "module": "commonjs",                // Mantido (Node.js)
+    "moduleResolution": "Node",
+    "lib": ["ES2020", "esnext.asynciterable"], // Atualizado para ES2020
+    "rootDir": "./src",                  // Adicionado: define a raiz dos arquivos TypeScript
+    "outDir": "./dist",                  // Saída compilada
+    "strict": true,                      // Substitui todas as flags estritas individuais
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,                // Ignora verificação de tipos em libs externas
+    "sourceMap": true,                   // Gera source maps para debugging
+    "esModuleInterop": true,             // Compatibilidade entre ESM e CommonJS
+    "emitDecoratorMetadata": true,       // Habilita decorators (TypeORM/NestJS)
+    "experimentalDecorators": true,      // Habilita decorators
+    "resolveJsonModule": true,           // Permite importar JSON
+    "baseUrl": ".",                      // Base para caminhos absolutos
+    "paths": {
+      "@/*": ["src/*"]                   // Aliases para imports
+    },
+    "forceConsistentCasingInFileNames": true // Evita erros de case sensitivity
+  },
+  "include": ["src/**/*.ts"],            // Apenas arquivos .ts em src
+  "exclude": ["node_modules", "dist"]    // Ignora node_modules e pasta de output
+}
