@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +5,132 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// Módulo de Autenticação
+model User {
+  id             String       @id @default(uuid())
+  email          String       @unique
+  password       String
+  isActive       Boolean      @default(true)
+  pessoa         Pessoa?      @relation(fields: [pessoaId], references: [id])
+  pessoaId       String?      @unique
+  roles          Role[]       @relation("UserRoles")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("users")
+}
+
+model Role {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  description String?
+  users       User[]       @relation("UserRoles")
+  permissions Permission[] @relation("RolePermissions")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  roles       Role[]   @relation("RolePermissions")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("permissions")
+}
+
+// Módulo de Pessoas
+model Pessoa {
+  id              String           @id @default(uuid())
+  nome            String
+  email           String?          @unique
+  telefone        String?
+  celular         String?
+  dataNascimento  DateTime?
+  cpf             String?          @unique
+  rg              String?
+  endereco        String?
+  bairro          String?
+  cidade          String?
+  estado          String?
+  cep             String?
+  observacoes     String?
+  foto            String?
+  ativo           Boolean          @default(true)
+  user            User?
+  categorias      Categoria[]      @relation("PessoaCategorias")
+  cargos          Cargo[]          @relation("PessoaCargos")
+  camposAdicionais CampoAdicionalValor[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("pessoas")
+}
+
+model Categoria {
+  id          String    @id @default(uuid())
+  nome        String    @unique
+  descricao   String?
+  cor         String?
+  pessoas     Pessoa[]  @relation("PessoaCategorias")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("categorias")
+}
+
+model Cargo {
+  id          String    @id @default(uuid())
+  nome        String    @unique
+  descricao   String?
+  pessoas     Pessoa[]  @relation("PessoaCargos")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("cargos")
+}
+
+model CampoAdicional {
+  id          String                @id @default(uuid())
+  nome        String                @unique
+  tipo        String                // text, number, date, select, checkbox
+  obrigatorio Boolean               @default(false)
+  opcoes      String?               // Para campos do tipo select, armazena as opções em formato JSON
+  valores     CampoAdicionalValor[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@map("campos_adicionais")
+}
+
+model CampoAdicionalValor {
+  id               String         @id @default(uuid())
+  valor            String
+  pessoa           Pessoa         @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  pessoaId         String
+  campoAdicional   CampoAdicional @relation(fields: [campoAdicionalId], references: [id], onDelete: Cascade)
+  campoAdicionalId String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([pessoaId, campoAdicionalId])
+  @@map("campo_adicional_valores")
+}
+
+model ModeloCartao {
+  id          String    @id @default(uuid())
+  nome        String    @unique
+  descricao   String?
+  template    String    // HTML template para o cartão
+  ativo       Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("modelos_cartao")
 }
