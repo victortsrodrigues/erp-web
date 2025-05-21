@@ -1,18 +1,21 @@
-import { container, Lifecycle } from 'tsyringe';
+import { container, Lifecycle } from "tsyringe";
 
 // Importações das interfaces e implementações
-import { PeopleRepository } from '../../modules/people/repositories/peopleRepository';
-import { PeopleService } from '../../modules/people/services/peopleService';
-import { PeopleController } from '../../modules/people/controllers/peopleController';
+import { PeopleRepository } from "../../modules/people/repositories/peopleRepository";
+import { PeopleService } from "../../modules/people/services/peopleService";
+import { PeopleController } from "../../modules/people/controllers/peopleController";
+import { IPeopleRepository } from "../../modules/people/interfaces/IPeopleRepository";
+import { IPeopleService } from "../../modules/people/interfaces/IPeopleService";
+import { TOKENS } from "../tokens";
 
 // Registrando na ordem correta (de baixo para cima na árvore de dependências)
-container.register(
-  PeopleRepository,
+container.register<IPeopleRepository>(
+  TOKENS.PeopleRepository,
   { useClass: PeopleRepository },
   { lifecycle: Lifecycle.Singleton }
 );
-container.register(
-  PeopleService,
+container.register<IPeopleService>(
+  TOKENS.PeopleService,
   { useClass: PeopleService },
   { lifecycle: Lifecycle.Singleton }
 );

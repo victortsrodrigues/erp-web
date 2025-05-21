@@ -1,3 +1,4 @@
+import '../../../common/container';
 import { Router } from "express";
 import { container } from 'tsyringe';
 import { PeopleController } from "../controllers/peopleController";
