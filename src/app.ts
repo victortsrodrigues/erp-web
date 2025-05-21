@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,6 +7,7 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 import { errorHandlerMiddleware } from './common/middlewares/errorHandlerMiddleware';
 import routes from './routes';
+import './common/container';
 
 dotenv.config();
 
