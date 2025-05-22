@@ -11,5 +11,6 @@ const peopleController = container.resolve(PeopleController);
 
 peopleRouter.post('/', validateSchema(createPeopleSchema), peopleController.create);
 peopleRouter.get('/', peopleController.findAll);
+peopleRouter.get('/:id', peopleController.findById);
 
 export default peopleRouter;

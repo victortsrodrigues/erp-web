@@ -35,4 +35,14 @@ export class PeopleController {
       next(error); // Encaminha o erro para o middleware global
     }
   }
+
+  findById = async (req: Request, res: Response, next: Function) => {
+    try {
+      const { id } = req.params;
+      const people = await this.peopleService.findPeopleById(id);
+      res.status(200).json(people);
+    } catch (error) {
+      next(error); // Encaminha o erro para o middleware global
+    }
+  }
 }

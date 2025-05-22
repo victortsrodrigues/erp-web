@@ -20,6 +20,37 @@ export class PeopleModel implements IPeopleModel {
   createdAt?: Date;
   updatedAt?: Date;
 
+  categorias?: Array<{
+    id: string;
+    nome: string;
+    descricao?: string;
+    cor?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }>;
+
+  cargos?: Array<{
+    id: string;
+    nome: string;
+    descricao?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }>;
+
+  camposAdicionais?: Array<{
+    id: string;
+    valor: string;
+    campoAdicional: {
+      id: string;
+      nome: string;
+      tipo: string;
+      obrigatorio: boolean;
+      opcoes?: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  }>;
+
   constructor(data: IPeopleModel) {
     this.id = data.id;
     this.nome = data.nome;
@@ -39,5 +70,9 @@ export class PeopleModel implements IPeopleModel {
     this.ativo = data.ativo ?? true;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
+
+    this.categorias = data.categorias;
+    this.cargos = data.cargos;
+    this.camposAdicionais = data.camposAdicionais;
   }
 }

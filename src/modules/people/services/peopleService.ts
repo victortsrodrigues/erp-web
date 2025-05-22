@@ -22,4 +22,8 @@ export class PeopleService implements IPeopleService {
   findAllPeople = async (): Promise<any[]> => {
     return await this.peopleRepository.findAllPeople();
   }
+
+  findPeopleById = async (id: string): Promise<any> => {
+    return await this.peopleRepository.findPeopleById(id);
+  }
 }
