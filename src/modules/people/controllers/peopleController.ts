@@ -26,4 +26,13 @@ export class PeopleController {
       next(error); // Encaminha o erro para o middleware global
     }
   };
+
+  findAll = async (_req: Request, res: Response, next: Function) => {
+    try {
+      const people = await this.peopleService.findAllPeople();
+      res.status(200).json(people);
+    } catch (error) {
+      next(error); // Encaminha o erro para o middleware global
+    }
+  }
 }

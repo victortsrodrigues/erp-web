@@ -1,7 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { IPeopleRepository } from "../interfaces/IPeopleRepository";
-// import { IPeopleModel } from "../interfaces/IPeopleModel";
-// import { PeopleModel } from "../models/PeopleModel";
+import { IPeopleModel } from "../interfaces/IPeopleModel";
+import { PeopleModel } from "../models/PeopleModel";
 import { CreatePeopleDTO } from "../dtos/createPeopleDTO";
 import prismaClient from "../../../database/client";
 import { TOKENS } from "../../../common/tokens";
@@ -17,7 +17,7 @@ export class PeopleRepository implements IPeopleRepository {
     console.log(`Hello from people repository ${name}`);
   }
 
-  async createPeople(data: CreatePeopleDTO): Promise<void> {
+  createPeople = async (data: CreatePeopleDTO): Promise<void> => {
     const createdPeople = await this.prisma.people.create({
       data: {
         nome: data.nome,
@@ -61,5 +61,51 @@ export class PeopleRepository implements IPeopleRepository {
       },
     });
     console.log(createdPeople);
-  }
+  };
+
+  findAllPeople = async (): Promise<IPeopleModel[]> => {
+    const all = await this.prisma.people.findMany();
+    return all.map((p) => {
+      const {
+        id,
+        nome,
+        email,
+        telefone,
+        celular,
+        dataNascimento,
+        cpf,
+        rg,
+        endereco,
+        bairro,
+        cidade,
+        estado,
+        cep,
+        observacoes,
+        foto,
+        ativo,
+        createdAt,
+        updatedAt,
+      } = p;
+      return new PeopleModel({
+        id,
+        nome,
+        email: email ?? undefined,
+        telefone: telefone ?? undefined,
+        celular: celular ?? undefined,
+        dataNascimento: dataNascimento ?? undefined,
+        cpf: cpf ?? undefined,
+        rg: rg ?? undefined,
+        endereco: endereco ?? undefined,
+        bairro: bairro ?? undefined,
+        cidade: cidade ?? undefined,
+        estado: estado ?? undefined,
+        cep: cep ?? undefined,
+        observacoes: observacoes ?? undefined,
+        foto: foto ?? undefined,
+        ativo,
+        createdAt,
+        updatedAt,
+      });
+    });
+  };
 }

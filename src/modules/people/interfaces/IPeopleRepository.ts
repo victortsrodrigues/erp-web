@@ -1,7 +1,8 @@
 import { CreatePeopleDTO } from "../dtos/createPeopleDTO";
-// import { IPeopleModel } from "./IPeopleModel";
+import { IPeopleModel } from "./IPeopleModel";
 
 export interface IPeopleRepository {
   log(name: string): void;
   createPeople(data: CreatePeopleDTO): Promise<void>;
+  findAllPeople(): Promise<IPeopleModel[]>;
 }

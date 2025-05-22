@@ -9,7 +9,7 @@ const peopleRouter = Router();
 // Resolver o controller do container
 const peopleController = container.resolve(PeopleController);
 
-peopleRouter.get('/', peopleController.log);
 peopleRouter.post('/', validateSchema(createPeopleSchema), peopleController.create);
+peopleRouter.get('/', peopleController.findAll);
 
 export default peopleRouter;

@@ -18,4 +18,8 @@ export class PeopleService implements IPeopleService {
   createPeople = async (body: CreatePeopleDTO): Promise<void> => {
     await this.peopleRepository.createPeople(body);
   }
+
+  findAllPeople = async (): Promise<any[]> => {
+    return await this.peopleRepository.findAllPeople();
+  }
 }
