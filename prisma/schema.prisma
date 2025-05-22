@@ -13,7 +13,7 @@ model User {
   email          String       @unique
   password       String
   isActive       Boolean      @default(true)
-  pessoa         Pessoa?      @relation(fields: [pessoaId], references: [id])
+  pessoa         People?      @relation(fields: [pessoaId], references: [id])
   pessoaId       String?      @unique
   roles          Role[]       @relation("UserRoles")
   createdAt      DateTime     @default(now())
@@ -46,7 +46,7 @@ model Permission {
 }
 
 // Módulo de Pessoas
-model Pessoa {
+model People {
   id              String           @id @default(uuid())
   nome            String
   email           String?          @unique
@@ -64,32 +64,32 @@ model Pessoa {
   foto            String?
   ativo           Boolean          @default(true)
   user            User?
-  categorias      Categoria[]      @relation("PessoaCategorias")
+  categorias      Category[]      @relation("PessoaCategorias")
   cargos          Cargo[]          @relation("PessoaCargos")
   camposAdicionais CampoAdicionalValor[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
-  @@map("pessoas")
+  @@map("people")
 }
 
-model Categoria {
+model Category {
   id          String    @id @default(uuid())
   nome        String    @unique
   descricao   String?
   cor         String?
-  pessoas     Pessoa[]  @relation("PessoaCategorias")
+  pessoas     People[]  @relation("PessoaCategorias")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  @@map("categorias")
+  @@map("category")
 }
 
 model Cargo {
   id          String    @id @default(uuid())
   nome        String    @unique
   descricao   String?
-  pessoas     Pessoa[]  @relation("PessoaCargos")
+  pessoas     People[]  @relation("PessoaCargos")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -112,7 +112,7 @@ model CampoAdicional {
 model CampoAdicionalValor {
   id               String         @id @default(uuid())
   valor            String
-  pessoa           Pessoa         @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  pessoa           People         @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
   pessoaId         String
   campoAdicional   CampoAdicional @relation(fields: [campoAdicionalId], references: [id], onDelete: Cascade)
   campoAdicionalId String

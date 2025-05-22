@@ -2,6 +2,7 @@ import { injectable, inject } from "tsyringe";
 import { IPeopleService } from "../interfaces/IPeopleService";
 import { IPeopleRepository } from "../interfaces/IPeopleRepository";
 import { TOKENS } from "../../../common/tokens";
+import { CreatePeopleDTO } from "../dtos/createPeopleDTO";
 
 @injectable()
 export class PeopleService implements IPeopleService {
@@ -13,4 +14,8 @@ export class PeopleService implements IPeopleService {
   log = (name: string): void => {
     this.peopleRepository.log(name);
   };
+
+  create = (body: CreatePeopleDTO): CreatePeopleDTO => {
+    return body;
+  }
 }

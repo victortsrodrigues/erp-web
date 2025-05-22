@@ -1,7 +1,8 @@
-import '../../../common/container';
 import { Router } from "express";
 import { container } from 'tsyringe';
 import { PeopleController } from "../controllers/peopleController";
+import { createPeopleSchema } from "../dtos/createPeopleDTO";
+import { validateSchema } from "../../../common/middlewares/validateSchemaMiddleware";
 
 const peopleRouter = Router();
 
@@ -9,5 +10,6 @@ const peopleRouter = Router();
 const peopleController = container.resolve(PeopleController);
 
 peopleRouter.get('/', peopleController.log);
+peopleRouter.post('/', validateSchema(createPeopleSchema), peopleController.create);
 
 export default peopleRouter;
