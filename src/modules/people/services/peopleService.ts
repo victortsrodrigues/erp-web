@@ -15,7 +15,7 @@ export class PeopleService implements IPeopleService {
     this.peopleRepository.log(name);
   };
 
-  create = (body: CreatePeopleDTO): CreatePeopleDTO => {
-    return body;
+  createPeople = async (body: CreatePeopleDTO): Promise<void> => {
+    await this.peopleRepository.createPeople(body);
   }
 }

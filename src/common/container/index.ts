@@ -7,7 +7,10 @@ import { PeopleController } from "../../modules/people/controllers/peopleControl
 import { IPeopleRepository } from "../../modules/people/interfaces/IPeopleRepository";
 import { IPeopleService } from "../../modules/people/interfaces/IPeopleService";
 import { TOKENS } from "../tokens";
+import prismaClient from "../../database/client";
 
+// Registrar PrismaClient como singleton
+container.registerInstance(TOKENS.PrismaClient, prismaClient);
 // Registrando na ordem correta (de baixo para cima na árvore de dependências)
 container.register<IPeopleRepository>(
   TOKENS.PeopleRepository,

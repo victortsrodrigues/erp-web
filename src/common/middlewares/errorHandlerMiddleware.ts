@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../errors/appError';
+import { Prisma } from '@prisma/client';
 
 export function errorHandlerMiddleware(
   error: Error,
@@ -11,6 +12,25 @@ export function errorHandlerMiddleware(
     response.status(error.statusCode).json({
       status: 'error',
       message: error.message
+    });
+    return;
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    
+    const regex = /Unique constraint failed on the fields: \(`[a-zA-Z]+`\)/;
+    const match = regex.exec(error.message);
+
+    if (match) {
+      response.status(400).json({
+        message: `${match[0]}`
+      });
+      return;
+    }
+
+    response.status(400).json({
+      code: error.code,
+      message: error.message,
     });
     return;
   }

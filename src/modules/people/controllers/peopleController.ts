@@ -17,9 +17,13 @@ export class PeopleController {
     res.status(200).send("Larissa linda");
   };
 
-  create = (req: Request, res: Response): void => {
-    const body: CreatePeopleDTO = req.body;
-    const createdPeople = this.peopleService.create(body);
-    res.status(201).json(`Created with body: ${JSON.stringify(body)} and createdPeople: ${JSON.stringify(createdPeople)}`);
-  }
+  create = async (req: Request, res: Response, next: Function) => {
+    try {
+      const body: CreatePeopleDTO = req.body.data;
+      await this.peopleService.createPeople(body);
+      res.status(201).json(`Created with body: ${JSON.stringify(body)}`);
+    } catch (error) {
+      next(error); // Encaminha o erro para o middleware global
+    }
+  };
 }
