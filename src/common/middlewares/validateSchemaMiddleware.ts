@@ -7,7 +7,17 @@ export const validateSchema = (schema: ZodSchema) => {
     req.body = schema.safeParse(req.body);
 
     if (!req.body.success) {
-      res.status(400).send(fromZodError(req.body.error).message);
+      const zodError = fromZodError(req.body.error);
+
+      const errors = zodError.details.map(detail => ({
+        field: detail.path.join('.'),
+        message: detail.message
+      }))
+
+      res.status(400).json({
+        status:  'error',
+        errors
+      })
       return;
     }
 

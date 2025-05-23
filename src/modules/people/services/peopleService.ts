@@ -13,10 +13,6 @@ export class PeopleService implements IPeopleService {
     private readonly peopleRepository: IPeopleRepository
   ) {}
 
-  log = (name: string): void => {
-    this.peopleRepository.log(name);
-  };
-
   createPeople = async (body: CreatePeopleDTO): Promise<void> => {
     await this.peopleRepository.createPeople(body);
   }

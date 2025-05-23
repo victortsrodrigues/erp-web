@@ -50,11 +50,11 @@ model People {
   id              String           @id @default(uuid())
   nome            String
   email           String?          @unique
-  telefone        String?
-  celular         String?
+  telefone        String?         @unique
+  celular         String?         @unique
   dataNascimento  DateTime?
   cpf             String?          @unique
-  rg              String?
+  rg              String?         @unique
   endereco        String?
   bairro          String?
   cidade          String?

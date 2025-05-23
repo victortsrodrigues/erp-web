@@ -12,12 +12,6 @@ export class PeopleController {
     private readonly peopleService: IPeopleService
   ) {}
 
-  log = (req: Request, res: Response): void => {
-    const { name } = req.query;
-    this.peopleService.log(name as string);
-    res.status(200).send("Larissa linda");
-  };
-
   create = async (req: Request, res: Response, next: Function) => {
     try {
       const body: CreatePeopleDTO = req.body.data;

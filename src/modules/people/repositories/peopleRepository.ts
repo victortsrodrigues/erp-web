@@ -14,10 +14,6 @@ export class PeopleRepository implements IPeopleRepository {
     private readonly prisma: typeof prismaClient
   ) {}
 
-  log(name: string): void {
-    console.log(`Hello from people repository ${name}`);
-  }
-
   createPeople = async (data: CreatePeopleDTO): Promise<IPeopleModel> => {
     const created = await this.prisma.people.create({
       data: {
