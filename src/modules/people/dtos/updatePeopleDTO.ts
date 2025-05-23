@@ -1,7 +1,7 @@
 import { z } from "zod"; 
 
-export const createPeopleSchema = z.object({
-  nome: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
+export const updatePeopleSchema = z.object({
+  nome: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').optional(),
   email: z.string().email('Email inválido').optional().nullable(),
   telefone: z.string().length(11, 'Telefone must have 11 digits').optional().nullable(),
   celular: z.string().length(11, 'Telefone must have 11 digits').optional().nullable(),
@@ -15,10 +15,10 @@ export const createPeopleSchema = z.object({
   cep: z.string().optional().nullable(),
   observacoes: z.string().optional().nullable(),
   foto: z.string().optional().nullable(),
-  ativo: z.boolean().default(true),
+  ativo: z.boolean().optional(),
   categorias: z.array(z.string()).optional(),
   cargos: z.array(z.string()).optional(),
   camposAdicionais: z.record(z.string(), z.string()).optional()
 });
 
-export type CreatePeopleDTO = z.infer<typeof createPeopleSchema>;
+export type UpdatePeopleDTO = z.infer<typeof updatePeopleSchema>;
