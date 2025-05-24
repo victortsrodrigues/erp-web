@@ -6,7 +6,16 @@ import { PeopleService } from "../../modules/people/services/peopleService";
 import { PeopleController } from "../../modules/people/controllers/peopleController";
 import { IPeopleRepository } from "../../modules/people/interfaces/IPeopleRepository";
 import { IPeopleService } from "../../modules/people/interfaces/IPeopleService";
+
+import { CategoryRepository } from "../../modules/people/repositories/categoryRepository";
+import { CategoryService } from "../../modules/people/services/categoryService";
+import { ICategoryRepository } from "../../modules/people/interfaces/ICategoryRepository";
+import { ICategoryService } from "../../modules/people/interfaces/ICategoryService";
+import { CategoryController } from "../../modules/people/controllers/categoryController";
+
 import { TOKENS } from "../tokens";
+
+// Database
 import prismaClient from "../../database/client";
 
 // Registrar PrismaClient como singleton
@@ -28,4 +37,19 @@ container.register(
   { lifecycle: Lifecycle.Singleton }
 );
 
-// Você registrará outras dependências à medida que cria novos módulos
+// Category
+container.register<ICategoryRepository>(
+  TOKENS.CategoryRepository,
+  { useClass: CategoryRepository },
+  { lifecycle: Lifecycle.Singleton }
+);
+container.register<ICategoryService>(
+  TOKENS.CategoryService,
+  { useClass: CategoryService },
+  { lifecycle: Lifecycle.Singleton }
+);
+container.register(
+  CategoryController,
+  { useClass: CategoryController },
+  { lifecycle: Lifecycle.Singleton }
+);

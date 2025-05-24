@@ -14,6 +14,9 @@ export class PeopleService implements IPeopleService {
   ) {}
 
   createPeople = async (body: CreatePeopleDTO): Promise<void> => {
+    
+    console.log("Received body:", body);
+
     await this.peopleRepository.createPeople(body);
   }
 
@@ -25,6 +28,7 @@ export class PeopleService implements IPeopleService {
     const person = await this.peopleRepository.findPeopleById(id);
     
     if (!person) {
+      console.log("Passou aqui no findPeopleById");
       throw new AppError(`Person not found`, 404);
     }
 
