@@ -23,55 +23,60 @@ export class PeopleService implements IPeopleService {
   ) {}
 
   createPeople = async (body: CreatePeopleDTO): Promise<void> => {
-    // 1. VALIDAÇÃO DE DUPLICATAS - Email
+    await this.validateDuplicateFieldsToCreate(body);
+    
+    // Verifica se as categorias fornecidas existem
+    await this.validateCategories(body.categorias);
+
+    // Verifica se os cargos fornecidos existem
+    await this.validateCargos(body.cargos);
+
+    // Verifica se os campos adicionais fornecidos existem
+    await this.validateCamposAdicionais(body.camposAdicionais);
+
+    await this.peopleRepository.createPeople(body);
+  };
+
+  private async validateDuplicateFieldsToCreate(body: CreatePeopleDTO): Promise<void> {
     if (body.email) {
       const existingPersonByEmail = await this.peopleRepository.findPeopleByEmail(body.email);
       if (existingPersonByEmail) {
         throw new AppError("Já existe uma pessoa cadastrada com este email", 409);
       }
     }
-
-    // 2. VALIDAÇÃO DE DUPLICATAS - CPF
     if (body.cpf) {
       const existingPersonByCPF = await this.peopleRepository.findPeopleByCPF(body.cpf);
       if (existingPersonByCPF) {
         throw new AppError("Já existe uma pessoa cadastrada com este CPF", 409);
       }
     }
-
-    // 3. VALIDAÇÃO DE DUPLICATAS - Telefone
     if (body.telefone) {
       const existingPersonByTelefone = await this.peopleRepository.findPeopleByTelefone(body.telefone);
       if (existingPersonByTelefone) {
         throw new AppError("Já existe uma pessoa cadastrada com este telefone", 409);
       }
     }
-
-    // 4. VALIDAÇÃO DE DUPLICATAS - Celular
     if (body.celular) {
       const existingPersonByCelular = await this.peopleRepository.findPeopleByCelular(body.celular);
       if (existingPersonByCelular) {
         throw new AppError("Já existe uma pessoa cadastrada com este celular", 409);
       }
     }
-
-    // 5. VALIDAÇÃO DE DUPLICATAS - RG
     if (body.rg) {
       const existingPersonByRG = await this.peopleRepository.findPeopleByRG(body.rg);
       if (existingPersonByRG) {
         throw new AppError("Já existe uma pessoa cadastrada com este RG", 409);
       }
     }
-    
-    // Verifica se as categorias fornecidas existem
-    if (body.categorias && body.categorias.length > 0) {
+  }
+
+  private async validateCategories(categorias?: string[]): Promise<void> {
+    if (categorias && categorias.length > 0) {
       const existingCategories = await this.categoryRepository.findAllCategory();
       const existingCategoryIds = existingCategories.map((category) => category.id);
-
-      const invalidCategories = body.categorias.filter(
+      const invalidCategories = categorias.filter(
         (categoryId) => !existingCategoryIds.includes(categoryId)
       );
-
       if (invalidCategories.length > 0) {
         throw new AppError(
           `Categories not found: ${invalidCategories.join(", ")}`,
@@ -79,16 +84,15 @@ export class PeopleService implements IPeopleService {
         );
       }
     }
+  }
 
-    // Verifica se os cargos fornecidos existem
-    if (body.cargos && body.cargos.length > 0) {
+  private async validateCargos(cargos?: string[]): Promise<void> {
+    if (cargos && cargos.length > 0) {
       const existingCargos = await this.cargoRepository.findAllCargo();
       const existingCargoIds = existingCargos.map((cargo) => cargo.id);
-
-      const invalidCargos = body.cargos.filter(
+      const invalidCargos = cargos.filter(
         (cargoId) => !existingCargoIds.includes(cargoId)
       );
-
       if (invalidCargos.length > 0) {
         throw new AppError(
           `Cargos not found: ${invalidCargos.join(", ")}`,
@@ -96,80 +100,74 @@ export class PeopleService implements IPeopleService {
         );
       }
     }
+  }
+  
+  private async validateCamposAdicionais(camposAdicionais?: Record<string, any>): Promise<void> {
+    if (!camposAdicionais || Object.keys(camposAdicionais).length === 0) return;
 
-    // Verifica se os campos adicionais fornecidos existem
-    if (body.camposAdicionais && Object.keys(body.camposAdicionais).length > 0) {
-      const campoIds = Object.keys(body.camposAdicionais);
-      
-      // Verificar se todos os campos existem
-      const existingCampos = await this.campoAdicionalRepository.findAllCampoAdicional();
-      const existingCampoIds = existingCampos.map(campo => campo.id);
-      
-      const invalidCampos = campoIds.filter(campoId => 
-        !existingCampoIds.includes(campoId)
-      );
+    const campoIds = Object.keys(camposAdicionais);
+    const existingCampos = await this.campoAdicionalRepository.findAllCampoAdicional();
+    const existingCampoIds = existingCampos.map(campo => campo.id);
 
-      if (invalidCampos.length > 0) {
-        throw new AppError(`Campos adicionais não encontrados: ${invalidCampos.join(', ')}`, 404);
+    const invalidCampos = campoIds.filter(campoId =>
+      !existingCampoIds.includes(campoId)
+    );
+    if (invalidCampos.length > 0) {
+      throw new AppError(`Campos adicionais não encontrados: ${invalidCampos.join(', ')}`, 404);
+    }
+
+    this.validateCamposObrigatorios(camposAdicionais, existingCampos);
+    this.validateCamposValores(camposAdicionais, existingCampos);
+  }
+
+  private validateCamposObrigatorios(camposAdicionais: Record<string, any>, existingCampos: any[]): void {
+    const campoIds = Object.keys(camposAdicionais);
+    const camposObrigatorios = existingCampos.filter(campo => campo.obrigatorio);
+    const camposObrigatoriosIds = camposObrigatorios.map(campo => campo.id);
+    const camposFaltando = camposObrigatoriosIds.filter(campoId =>
+      !campoIds.includes(campoId)
+    );
+    if (camposFaltando.length > 0) {
+      const nomesCamposFaltando = camposObrigatorios
+        .filter(campo => camposFaltando.includes(campo.id))
+        .map(campo => campo.nome);
+      throw new AppError(`Campos obrigatórios não preenchidos: ${nomesCamposFaltando.join(', ')}`, 400);
+    }
+  }
+
+  private validateCamposValores(camposAdicionais: Record<string, any>, existingCampos: any[]): void {
+    for (const [campoId, valor] of Object.entries(camposAdicionais)) {
+      const campo = existingCampos.find(c => c.id === campoId);
+      if (!campo) continue;
+
+      if (campo.tipo === 'select' && campo.opcoes) {
+        try {
+          const opcoes = JSON.parse(campo.opcoes);
+          if (!opcoes.includes(valor)) {
+            throw new AppError(`Valor '${valor}' não é válido para o campo '${campo.nome}'. Opções válidas: ${opcoes.join(', ')}`, 400);
+          }
+        } catch (error) {
+          throw new AppError(`Erro ao validar opções do campo '${campo.nome}': ${error}`, 400);
+        }
       }
-
-      // Validar campos obrigatórios
-      const camposObrigatorios = existingCampos.filter(campo => campo.obrigatorio);
-      const camposObrigatoriosIds = camposObrigatorios.map(campo => campo.id);
-      
-      const camposFaltando = camposObrigatoriosIds.filter(campoId => 
-        !campoIds.includes(campoId!)
-      );
-
-      if (camposFaltando.length > 0) {
-        const nomesCamposFaltando = camposObrigatorios
-          .filter(campo => camposFaltando.includes(campo.id))
-          .map(campo => campo.nome);
-        
-        throw new AppError(`Campos obrigatórios não preenchidos: ${nomesCamposFaltando.join(', ')}`, 400);
+      if (campo.tipo === 'number') {
+        if (isNaN(Number(valor))) {
+          throw new AppError(`O campo '${campo.nome}' deve ser um número válido`, 400);
+        }
       }
-
-      // Validar valores dos campos do tipo 'select'
-      for (const [campoId, valor] of Object.entries(body.camposAdicionais)) {
-        const campo = existingCampos.find(c => c.id === campoId);
-        
-        if (campo && campo.tipo === 'select' && campo.opcoes) {
-          try {
-            const opcoes = JSON.parse(campo.opcoes);
-            if (!opcoes.includes(valor)) {
-              throw new AppError(`Valor '${valor}' não é válido para o campo '${campo.nome}'. Opções válidas: ${opcoes.join(', ')}`, 400);
-            }
-          } catch (error) {
-            throw new AppError(`Erro ao validar opções do campo '${campo.nome}': ${error}`, 400);
-          }
+      if (campo.tipo === 'date') {
+        const date = new Date(valor);
+        if (isNaN(date.getTime())) {
+          throw new AppError(`O campo '${campo.nome}' deve ser uma data válida`, 400);
         }
-
-        // Validar campos do tipo 'number'
-        if (campo && campo.tipo === 'number') {
-          if (isNaN(Number(valor))) {
-            throw new AppError(`O campo '${campo.nome}' deve ser um número válido`, 400);
-          }
-        }
-
-        // Validar campos do tipo 'date'
-        if (campo && campo.tipo === 'date') {
-          const date = new Date(valor);
-          if (isNaN(date.getTime())) {
-            throw new AppError(`O campo '${campo.nome}' deve ser uma data válida`, 400);
-          }
-        }
-
-        // Validar campos do tipo 'checkbox'
-        if (campo && campo.tipo === 'checkbox') {
-          if (!['true', 'false', '1', '0'].includes(valor.toLowerCase())) {
-            throw new AppError(`O campo '${campo.nome}' deve ser um valor booleano (true/false)`, 400);
-          }
+      }
+      if (campo.tipo === 'checkbox') {
+        if (!['true', 'false', '1', '0'].includes(String(valor).toLowerCase())) {
+          throw new AppError(`O campo '${campo.nome}' deve ser um valor booleano (true/false)`, 400);
         }
       }
     }
-
-    await this.peopleRepository.createPeople(body);
-  };
+  }
 
   findAllPeople = async (): Promise<any[]> => {
     return await this.peopleRepository.findAllPeople();
@@ -190,9 +188,53 @@ export class PeopleService implements IPeopleService {
     if (!existingPerson) {
       throw new AppError("Pessoa não encontrada", 404);
     }
+
+    await this.validateDuplicateFieldsToUpdate(id, body);
+
+    // Verifica se as categorias fornecidas existem
+    await this.validateCategories(body.categorias);
+
+    // Verifica se os cargos fornecidos existem
+    await this.validateCargos(body.cargos);
+
+    // Verifica se os campos adicionais fornecidos existem
+    await this.validateCamposAdicionais(body.camposAdicionais);
     
     await this.peopleRepository.updatePeople(id, body);
   };
+
+  private async validateDuplicateFieldsToUpdate(id: string, body: UpdatePeopleDTO): Promise<void> {
+    if (body.email) {
+      const existingPersonByEmail = await this.peopleRepository.findPeopleByEmail(body.email);
+      if (existingPersonByEmail && existingPersonByEmail.id !== id) {
+        throw new AppError("Já existe uma pessoa cadastrada com este email", 409);
+      }
+    }
+    if (body.cpf) {
+      const existingPersonByCPF = await this.peopleRepository.findPeopleByCPF(body.cpf);
+      if (existingPersonByCPF && existingPersonByCPF.id !== id) {
+        throw new AppError("Já existe uma pessoa cadastrada com este CPF", 409);
+      }
+    }
+    if (body.telefone) {
+      const existingPersonByTelefone = await this.peopleRepository.findPeopleByTelefone(body.telefone);
+      if (existingPersonByTelefone && existingPersonByTelefone.id !== id) {
+        throw new AppError("Já existe uma pessoa cadastrada com este telefone", 409);
+      }
+    }
+    if (body.celular) {
+      const existingPersonByCelular = await this.peopleRepository.findPeopleByCelular(body.celular);
+      if (existingPersonByCelular && existingPersonByCelular.id !== id) {
+        throw new AppError("Já existe uma pessoa cadastrada com este celular", 409);
+      }
+    }
+    if (body.rg) {
+      const existingPersonByRG = await this.peopleRepository.findPeopleByRG(body.rg);
+      if (existingPersonByRG && existingPersonByRG.id !== id) {
+        throw new AppError("Já existe uma pessoa cadastrada com este RG", 409);
+      }
+    }
+  }
 
   deletePeople = async (id: string): Promise<void> => {
     const person = await this.peopleRepository.findPeopleById(id);
