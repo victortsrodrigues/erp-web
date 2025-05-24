@@ -66,57 +66,8 @@ export class PeopleRepository implements IPeopleRepository {
         },
       },
     });
-    console.log(created);
-    return new PeopleModel({
-      id: created.id,
-      nome: created.nome,
-      email: created.email ?? undefined,
-      telefone: created.telefone ?? undefined,
-      celular: created.celular ?? undefined,
-      dataNascimento: created.dataNascimento ?? undefined,
-      cpf: created.cpf ?? undefined,
-      rg: created.rg ?? undefined,
-      endereco: created.endereco ?? undefined,
-      bairro: created.bairro ?? undefined,
-      cidade: created.cidade ?? undefined,
-      estado: created.estado ?? undefined,
-      cep: created.cep ?? undefined,
-      observacoes: created.observacoes ?? undefined,
-      foto: created.foto ?? undefined,
-      ativo: created.ativo,
-      createdAt: created.createdAt,
-      updatedAt: created.updatedAt,
 
-      // Abaixo, as coleções vindas do include:
-      categorias: created.categorias.map((c) => ({
-        id: c.id,
-        nome: c.nome,
-        descricao: c.descricao ?? undefined,
-        cor: c.cor ?? undefined,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-      cargos: created.cargos.map((c) => ({
-        id: c.id,
-        nome: c.nome,
-        descricao: c.descricao ?? undefined,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-      camposAdicionais: created.camposAdicionais.map((v) => ({
-        id: v.id,
-        valor: v.valor,
-        campoAdicional: {
-          id: v.campoAdicional.id,
-          nome: v.campoAdicional.nome,
-          tipo: v.campoAdicional.tipo,
-          obrigatorio: v.campoAdicional.obrigatorio,
-          opcoes: v.campoAdicional.opcoes,
-          createdAt: v.campoAdicional.createdAt,
-          updatedAt: v.campoAdicional.updatedAt,
-        },
-      })),
-    });
+    return this.mapPersonToPeopleModel(created);
   };
 
   findAllPeople = async (): Promise<IPeopleModel[]> => {
@@ -129,56 +80,7 @@ export class PeopleRepository implements IPeopleRepository {
     });
 
     return all.map(
-      (p) =>
-        new PeopleModel({
-          id: p.id,
-          nome: p.nome,
-          email: p.email ?? undefined,
-          telefone: p.telefone ?? undefined,
-          celular: p.celular ?? undefined,
-          dataNascimento: p.dataNascimento ?? undefined,
-          cpf: p.cpf ?? undefined,
-          rg: p.rg ?? undefined,
-          endereco: p.endereco ?? undefined,
-          bairro: p.bairro ?? undefined,
-          cidade: p.cidade ?? undefined,
-          estado: p.estado ?? undefined,
-          cep: p.cep ?? undefined,
-          observacoes: p.observacoes ?? undefined,
-          foto: p.foto ?? undefined,
-          ativo: p.ativo,
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt,
-
-          categorias: p.categorias.map((c) => ({
-            id: c.id,
-            nome: c.nome,
-            descricao: c.descricao ?? undefined,
-            cor: c.cor ?? undefined,
-            createdAt: c.createdAt,
-            updatedAt: c.updatedAt,
-          })),
-          cargos: p.cargos.map((c) => ({
-            id: c.id,
-            nome: c.nome,
-            descricao: c.descricao ?? undefined,
-            createdAt: c.createdAt,
-            updatedAt: c.updatedAt,
-          })),
-          camposAdicionais: p.camposAdicionais.map((v) => ({
-            id: v.id,
-            valor: v.valor,
-            campoAdicional: {
-              id: v.campoAdicional.id,
-              nome: v.campoAdicional.nome,
-              tipo: v.campoAdicional.tipo,
-              obrigatorio: v.campoAdicional.obrigatorio,
-              opcoes: v.campoAdicional.opcoes,
-              createdAt: v.campoAdicional.createdAt,
-              updatedAt: v.campoAdicional.updatedAt,
-            },
-          })),
-        })
+      (p) => this.mapPersonToPeopleModel(p)
     );
   };
 
@@ -194,55 +96,7 @@ export class PeopleRepository implements IPeopleRepository {
 
     if (!p) return null;
 
-    return new PeopleModel({
-      id: p.id,
-      nome: p.nome,
-      email: p.email ?? undefined,
-      telefone: p.telefone ?? undefined,
-      celular: p.celular ?? undefined,
-      dataNascimento: p.dataNascimento ?? undefined,
-      cpf: p.cpf ?? undefined,
-      rg: p.rg ?? undefined,
-      endereco: p.endereco ?? undefined,
-      bairro: p.bairro ?? undefined,
-      cidade: p.cidade ?? undefined,
-      estado: p.estado ?? undefined,
-      cep: p.cep ?? undefined,
-      observacoes: p.observacoes ?? undefined,
-      foto: p.foto ?? undefined,
-      ativo: p.ativo,
-      createdAt: p.createdAt,
-      updatedAt: p.updatedAt,
-
-      categorias: p.categorias.map((c) => ({
-        id: c.id,
-        nome: c.nome,
-        descricao: c.descricao ?? undefined,
-        cor: c.cor ?? undefined,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-      cargos: p.cargos.map((c) => ({
-        id: c.id,
-        nome: c.nome,
-        descricao: c.descricao ?? undefined,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-      camposAdicionais: p.camposAdicionais.map((v) => ({
-        id: v.id,
-        valor: v.valor,
-        campoAdicional: {
-          id: v.campoAdicional.id,
-          nome: v.campoAdicional.nome,
-          tipo: v.campoAdicional.tipo,
-          obrigatorio: v.campoAdicional.obrigatorio,
-          opcoes: v.campoAdicional.opcoes,
-          createdAt: v.campoAdicional.createdAt,
-          updatedAt: v.campoAdicional.updatedAt,
-        },
-      })),
-    });
+    return this.mapPersonToPeopleModel(p);
   };
 
   updatePeople = async (
@@ -309,59 +163,134 @@ export class PeopleRepository implements IPeopleRepository {
       },
     });
 
-    // Mapear updated (semelhante ao findById / findAll) para PeopleModel
-    return new PeopleModel({
-      id: updated.id,
-      nome: updated.nome,
-      email: updated.email ?? undefined,
-      telefone: updated.telefone ?? undefined,
-      celular: updated.celular ?? undefined,
-      dataNascimento: updated.dataNascimento ?? undefined,
-      cpf: updated.cpf ?? undefined,
-      rg: updated.rg ?? undefined,
-      endereco: updated.endereco ?? undefined,
-      bairro: updated.bairro ?? undefined,
-      cidade: updated.cidade ?? undefined,
-      estado: updated.estado ?? undefined,
-      cep: updated.cep ?? undefined,
-      observacoes: updated.observacoes ?? undefined,
-      foto: updated.foto ?? undefined,
-      ativo: updated.ativo,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-
-      categorias: updated.categorias.map((c) => ({
-        id: c.id,
-        nome: c.nome,
-        descricao: c.descricao ?? undefined,
-        cor: c.cor ?? undefined,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-      cargos: updated.cargos.map((c) => ({
-        id: c.id,
-        nome: c.nome,
-        descricao: c.descricao ?? undefined,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-      camposAdicionais: updated.camposAdicionais.map((v) => ({
-        id: v.id,
-        valor: v.valor,
-        campoAdicional: {
-          id: v.campoAdicional.id,
-          nome: v.campoAdicional.nome,
-          tipo: v.campoAdicional.tipo,
-          obrigatorio: v.campoAdicional.obrigatorio,
-          opcoes: v.campoAdicional.opcoes,
-          createdAt: v.campoAdicional.createdAt,
-          updatedAt: v.campoAdicional.updatedAt,
-        },
-      })),
-    });
+    return this.mapPersonToPeopleModel(updated);
   };
 
   deletePeople = async (id: string): Promise<void> => {
     await this.prisma.people.delete({ where: { id } });
   };
+
+  findPeopleByEmail = async (email: string): Promise<IPeopleModel | null> => {
+  const person = await this.prisma.people.findUnique({
+    where: { email },
+    include: {
+      categorias: true,
+      cargos: true,
+      camposAdicionais: { include: { campoAdicional: true } },
+    },
+  });
+
+  if (!person) return null;
+
+  return this.mapPersonToPeopleModel(person);
+};
+
+findPeopleByCPF = async (cpf: string): Promise<IPeopleModel | null> => {
+  const person = await this.prisma.people.findUnique({
+    where: { cpf },
+    include: {
+      categorias: true,
+      cargos: true,
+      camposAdicionais: { include: { campoAdicional: true } },
+    },
+  });
+
+  if (!person) return null;
+
+  return this.mapPersonToPeopleModel(person);
+};
+
+findPeopleByTelefone = async (telefone: string): Promise<IPeopleModel | null> => {
+  const person = await this.prisma.people.findUnique({
+    where: { telefone },
+    include: {
+      categorias: true,
+      cargos: true,
+      camposAdicionais: { include: { campoAdicional: true } },
+    },
+  });
+
+  if (!person) return null;
+  return this.mapPersonToPeopleModel(person);
+};
+
+findPeopleByCelular = async (celular: string): Promise<IPeopleModel | null> => {
+  const person = await this.prisma.people.findUnique({
+    where: { celular },
+    include: {
+      categorias: true,
+      cargos: true,
+      camposAdicionais: { include: { campoAdicional: true } },
+    },
+  });
+
+  if (!person) return null;
+  return this.mapPersonToPeopleModel(person);
+};
+
+findPeopleByRG = async (rg: string): Promise<IPeopleModel | null> => {
+  const person = await this.prisma.people.findUnique({
+    where: { rg },
+    include: {
+      categorias: true,
+      cargos: true,
+      camposAdicionais: { include: { campoAdicional: true } },
+    },
+  });
+
+  if (!person) return null;
+  return this.mapPersonToPeopleModel(person);
+};
+
+// Método auxiliar para evitar repetição de código
+private readonly mapPersonToPeopleModel = (person: any): PeopleModel => {
+  return new PeopleModel({
+    id: person.id,
+    nome: person.nome,
+    email: person.email ?? undefined,
+    telefone: person.telefone ?? undefined,
+    celular: person.celular ?? undefined,
+    dataNascimento: person.dataNascimento ?? undefined,
+    cpf: person.cpf ?? undefined,
+    rg: person.rg ?? undefined,
+    endereco: person.endereco ?? undefined,
+    bairro: person.bairro ?? undefined,
+    cidade: person.cidade ?? undefined,
+    estado: person.estado ?? undefined,
+    cep: person.cep ?? undefined,
+    observacoes: person.observacoes ?? undefined,
+    foto: person.foto ?? undefined,
+    ativo: person.ativo,
+    createdAt: person.createdAt,
+    updatedAt: person.updatedAt,
+    categorias: person.categorias.map((c: any) => ({
+      id: c.id,
+      nome: c.nome,
+      descricao: c.descricao ?? undefined,
+      cor: c.cor ?? undefined,
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+    })),
+    cargos: person.cargos.map((c: any) => ({
+      id: c.id,
+      nome: c.nome,
+      descricao: c.descricao ?? undefined,
+      createdAt: c.createdAt,
+      updatedAt: c.updatedAt,
+    })),
+    camposAdicionais: person.camposAdicionais.map((v: any) => ({
+      id: v.id,
+      valor: v.valor,
+      campoAdicional: {
+        id: v.campoAdicional.id,
+        nome: v.campoAdicional.nome,
+        tipo: v.campoAdicional.tipo,
+        obrigatorio: v.campoAdicional.obrigatorio,
+        opcoes: v.campoAdicional.opcoes,
+        createdAt: v.campoAdicional.createdAt,
+        updatedAt: v.campoAdicional.updatedAt,
+      },
+    })),
+  });
+};
 }

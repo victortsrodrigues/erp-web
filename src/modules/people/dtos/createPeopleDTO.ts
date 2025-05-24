@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+const estadosBrasileiros = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 
+  'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 
+  'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+] as const;
+
 export const createPeopleSchema = z
   .object({
     nome: z.string().min(3, "Name must be at least 3 characters long").trim(),
@@ -54,6 +60,12 @@ export const createPeopleSchema = z
       .string()
       .length(2, "State must have 2 characters (UF)")
       .toUpperCase()
+      .refine((val) => {
+        if (!val) return true;
+        return estadosBrasileiros.includes(val as typeof estadosBrasileiros[number]);
+      }, {
+        message: "Estado deve ser uma sigla válida de estado brasileiro (ex: SP, RJ, MG)"
+      })
       .optional()
       .nullable(),
     cep: z.string().length(8, "CEP must have 8 digits").optional().nullable(),

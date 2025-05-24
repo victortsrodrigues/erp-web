@@ -8,4 +8,9 @@ export interface IPeopleRepository {
   findPeopleById(id: string): Promise<IPeopleModel | null>;
   updatePeople(id: string, data: UpdatePeopleDTO): Promise<IPeopleModel>;
   deletePeople(id: string): Promise<void>;
+  findPeopleByEmail(email: string): Promise<IPeopleModel | null>;
+  findPeopleByCPF(cpf: string): Promise<IPeopleModel | null>;
+  findPeopleByTelefone(telefone: string): Promise<IPeopleModel | null>;
+  findPeopleByCelular(celular: string): Promise<IPeopleModel | null>;
+  findPeopleByRG(rg: string): Promise<IPeopleModel | null>;
 }
