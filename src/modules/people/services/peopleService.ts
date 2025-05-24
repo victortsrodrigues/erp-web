@@ -1,6 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { IPeopleService } from "../interfaces/IPeopleService";
 import { IPeopleRepository } from "../interfaces/IPeopleRepository";
+import { ICategoryRepository } from "../interfaces/ICategoryRepository";
 import { TOKENS } from "../../../common/tokens";
 import { CreatePeopleDTO } from "../dtos/createPeopleDTO";
 import { UpdatePeopleDTO } from "../dtos/updatePeopleDTO";
@@ -10,13 +11,23 @@ import { AppError } from "../../../common/errors/appError";
 export class PeopleService implements IPeopleService {
   constructor(
     @inject(TOKENS.PeopleRepository)
-    private readonly peopleRepository: IPeopleRepository
+    private readonly peopleRepository: IPeopleRepository,
+    @inject(TOKENS.CategoryRepository)
+    private readonly categoryRepository: ICategoryRepository,
   ) {}
 
   createPeople = async (body: CreatePeopleDTO): Promise<void> => {
-    
-    console.log("Received body:", body);
+    if (body.categorias && body.categorias.length > 0) {
+      const existingCategories = await this.categoryRepository.findAllCategory();
+      const existingCategoryIds = existingCategories.map(category => category.id);
+      
+      const invalidCategories = body.categorias.filter(categoryId => !existingCategoryIds.includes(categoryId));
 
+      if (invalidCategories.length > 0) {
+        throw new AppError(`Categories not found: ${invalidCategories.join(', ')}`, 404);
+      }
+    }
+    
     await this.peopleRepository.createPeople(body);
   }
 
