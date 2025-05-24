@@ -22,13 +22,7 @@ export class CargoRepository implements ICargoRepository {
       },
     });
 
-    return new CargoModel({
-      id: created.id,
-      nome: created.nome,
-      descricao: created.descricao ?? undefined,
-      createdAt: created.createdAt,
-      updatedAt: created.updatedAt,
-    });
+    return this.mapToCargoModel(created);
   };
 
   findAllCargo = async (): Promise<ICargoModel[]> => {
@@ -38,13 +32,7 @@ export class CargoRepository implements ICargoRepository {
 
     return cargos.map(
       (cargo) =>
-        new CargoModel({
-          id: cargo.id,
-          nome: cargo.nome,
-          descricao: cargo.descricao ?? undefined,
-          createdAt: cargo.createdAt,
-          updatedAt: cargo.updatedAt,
-        })
+        this.mapToCargoModel(cargo)
     );
   };
 
@@ -55,13 +43,7 @@ export class CargoRepository implements ICargoRepository {
 
     if (!cargo) return null;
 
-    return new CargoModel({
-      id: cargo.id,
-      nome: cargo.nome,
-      descricao: cargo.descricao ?? undefined,
-      createdAt: cargo.createdAt,
-      updatedAt: cargo.updatedAt,
-    });
+    return this.mapToCargoModel(cargo);
   };
 
   updateCargo = async (id: string, data: UpdateCargoDTO): Promise<ICargoModel> => {
@@ -73,16 +55,43 @@ export class CargoRepository implements ICargoRepository {
       },
     });
 
-    return new CargoModel({
-      id: updated.id,
-      nome: updated.nome,
-      descricao: updated.descricao ?? undefined,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.mapToCargoModel(updated);
   };
 
   deleteCargo = async (id: string): Promise<void> => {
     await this.prisma.cargo.delete({ where: { id } });
   };
+
+  findCargoByName = async (nome: string): Promise<ICargoModel | null> => {
+    const cargo = await this.prisma.cargo.findUnique({
+      where: { nome },
+    });
+
+    if (!cargo) return null;
+    return this.mapToCargoModel(cargo);
+  };
+
+  countAllCargo = async (): Promise<number> => {
+    return await this.prisma.cargo.count();
+  };
+
+  countPeopleWithCargo = async (cargoId: string): Promise<number> => {
+    return await this.prisma.people.count({
+      where: {
+        cargos: {
+          some: { id: cargoId }
+        }
+      }
+    });
+  };
+
+  private readonly mapToCargoModel = (cargo: any): CargoModel => {
+  return new CargoModel({
+    id: cargo.id,
+    nome: cargo.nome,
+    descricao: cargo.descricao ?? undefined,
+    createdAt: cargo.createdAt,
+    updatedAt: cargo.updatedAt,
+  });
+};
 }

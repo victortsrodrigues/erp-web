@@ -8,4 +8,7 @@ export interface ICargoRepository {
   findCargoById(id: string): Promise<ICargoModel | null>;
   updateCargo(id: string, data: UpdateCargoDTO): Promise<ICargoModel>;
   deleteCargo(id: string): Promise<void>;
+  findCargoByName(nome: string): Promise<ICargoModel | null>;
+  countAllCargo(): Promise<number>;
+  countPeopleWithCargo(cargoId: string): Promise<number>;
 }
