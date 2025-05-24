@@ -6,20 +6,24 @@ import { PeopleService } from "../../modules/people/services/peopleService";
 import { PeopleController } from "../../modules/people/controllers/peopleController";
 import { IPeopleRepository } from "../../modules/people/interfaces/IPeopleRepository";
 import { IPeopleService } from "../../modules/people/interfaces/IPeopleService";
-
 //Category
 import { CategoryRepository } from "../../modules/people/repositories/categoryRepository";
 import { CategoryService } from "../../modules/people/services/categoryService";
 import { ICategoryRepository } from "../../modules/people/interfaces/ICategoryRepository";
 import { ICategoryService } from "../../modules/people/interfaces/ICategoryService";
 import { CategoryController } from "../../modules/people/controllers/categoryController";
-
 // Cargo
 import { CargoRepository } from "../../modules/people/repositories/cargoRepository";
 import { CargoService } from "../../modules/people/services/cargoService";
 import { CargoController } from "../../modules/people/controllers/cargoController";
 import { ICargoRepository } from "../../modules/people/interfaces/ICargoRepository";
 import { ICargoService } from "../../modules/people/interfaces/ICargoService";
+// CampoAdicional
+import { CampoAdicionalRepository } from "../../modules/people/repositories/campoAdicionalRepository";
+import { CampoAdicionalService } from "../../modules/people/services/campoAdicionalService";
+import { CampoAdicionalController } from "../../modules/people/controllers/campoAdicionalController";
+import { ICampoAdicionalRepository } from "../../modules/people/interfaces/ICampoAdicionalRepository";
+import { ICampoAdicionalService } from "../../modules/people/interfaces/ICampoAdicionalService";
 
 import { TOKENS } from "../tokens";
 
@@ -75,5 +79,21 @@ container.register<ICargoService>(
 container.register(
   CargoController,
   { useClass: CargoController },
+  { lifecycle: Lifecycle.Singleton }
+);
+// CampoAdicional
+container.register<ICampoAdicionalRepository>(
+  TOKENS.CampoAdicionalRepository,
+  { useClass: CampoAdicionalRepository },
+  { lifecycle: Lifecycle.Singleton }
+);
+container.register<ICampoAdicionalService>(
+  TOKENS.CampoAdicionalService,
+  { useClass: CampoAdicionalService },
+  { lifecycle: Lifecycle.Singleton }
+);
+container.register(
+  CampoAdicionalController,
+  { useClass: CampoAdicionalController },
   { lifecycle: Lifecycle.Singleton }
 );

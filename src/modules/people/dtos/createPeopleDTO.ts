@@ -66,7 +66,7 @@ export const createPeopleSchema = z
     ativo: z.boolean().default(true),
     categorias: z.array(z.string().uuid("Invalid category uuid")).optional(),
     cargos: z.array(z.string().uuid("Invalid cargo uuid")).optional(),
-    camposAdicionais: z.record(z.string(), z.string()).optional(),
+    camposAdicionais: z.record(z.string().uuid("Invalid campo-adicional uuid"), z.string()).optional(),
   })
   .refine(
     (data) => {
