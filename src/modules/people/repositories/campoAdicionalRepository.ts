@@ -24,15 +24,7 @@ export class CampoAdicionalRepository implements ICampoAdicionalRepository {
       },
     });
 
-    return new CampoAdicionalModel({
-      id: created.id,
-      nome: created.nome,
-      tipo: created.tipo,
-      obrigatorio: created.obrigatorio,
-      opcoes: created.opcoes ?? undefined,
-      createdAt: created.createdAt,
-      updatedAt: created.updatedAt,
-    });
+    return this.mapToCampoAdicionalModel(created);
   };
 
   findAllCampoAdicional = async (): Promise<ICampoAdicionalModel[]> => {
@@ -42,15 +34,7 @@ export class CampoAdicionalRepository implements ICampoAdicionalRepository {
 
     return campos.map(
       (campo) =>
-        new CampoAdicionalModel({
-          id: campo.id,
-          nome: campo.nome,
-          tipo: campo.tipo,
-          obrigatorio: campo.obrigatorio,
-          opcoes: campo.opcoes ?? undefined,
-          createdAt: campo.createdAt,
-          updatedAt: campo.updatedAt,
-        })
+        this.mapToCampoAdicionalModel(campo)
     );
   };
 
@@ -61,15 +45,7 @@ export class CampoAdicionalRepository implements ICampoAdicionalRepository {
 
     if (!campo) return null;
 
-    return new CampoAdicionalModel({
-      id: campo.id,
-      nome: campo.nome,
-      tipo: campo.tipo,
-      obrigatorio: campo.obrigatorio,
-      opcoes: campo.opcoes ?? undefined,
-      createdAt: campo.createdAt,
-      updatedAt: campo.updatedAt,
-    });
+    return this.mapToCampoAdicionalModel(campo);
   };
 
   updateCampoAdicional = async (id: string, data: UpdateCampoAdicionalDTO): Promise<ICampoAdicionalModel> => {
@@ -83,18 +59,56 @@ export class CampoAdicionalRepository implements ICampoAdicionalRepository {
       },
     });
 
-    return new CampoAdicionalModel({
-      id: updated.id,
-      nome: updated.nome,
-      tipo: updated.tipo,
-      obrigatorio: updated.obrigatorio,
-      opcoes: updated.opcoes ?? undefined,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.mapToCampoAdicionalModel(updated);
   };
 
   deleteCampoAdicional = async (id: string): Promise<void> => {
     await this.prisma.campoAdicional.delete({ where: { id } });
+  };
+
+  findCampoAdicionalByName = async (nome: string): Promise<ICampoAdicionalModel | null> => {
+    const campo = await this.prisma.campoAdicional.findUnique({
+      where: { nome },
+    });
+
+    if (!campo) return null;
+    return this.mapToCampoAdicionalModel(campo);
+  };
+
+  countAllCampoAdicional = async (): Promise<number> => {
+    return await this.prisma.campoAdicional.count();
+  };
+
+  hasExistingValues = async (campoId: string): Promise<boolean> => {
+    const count = await this.prisma.campoAdicionalValor.count({
+      where: { campoAdicionalId: campoId }
+    });
+
+    return count > 0;
+  };
+
+  hasValuesWithOptions = async (campoId: string, opcoes: string[]): Promise<boolean> => {
+    const count = await this.prisma.campoAdicionalValor.count({
+      where: {
+        campoAdicionalId: campoId,
+        valor: {
+          in: opcoes
+        }
+      }
+    });
+
+    return count > 0;
+  };
+
+  private readonly mapToCampoAdicionalModel = (campo: any): CampoAdicionalModel => {
+    return new CampoAdicionalModel({
+      id: campo.id,
+      nome: campo.nome,
+      tipo: campo.tipo,
+      obrigatorio: campo.obrigatorio,
+      opcoes: campo.opcoes ?? undefined,
+      createdAt: campo.createdAt,
+      updatedAt: campo.updatedAt,
+    });
   };
 }
