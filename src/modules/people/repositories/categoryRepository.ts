@@ -23,14 +23,7 @@ export class CategoryRepository implements ICategoryRepository {
       },
     });
 
-    return new CategoryModel({
-      id: created.id,
-      nome: created.nome,
-      descricao: created.descricao ?? undefined,
-      cor: created.cor ?? undefined,
-      createdAt: created.createdAt,
-      updatedAt: created.updatedAt,
-    });
+    return this.mapToCategoryModel(created);
   };
 
   findAllCategory = async (): Promise<ICategoryModel[]> => {
@@ -40,14 +33,7 @@ export class CategoryRepository implements ICategoryRepository {
 
     return categories.map(
       (category) =>
-        new CategoryModel({
-          id: category.id,
-          nome: category.nome,
-          descricao: category.descricao ?? undefined,
-          cor: category.cor ?? undefined,
-          createdAt: category.createdAt,
-          updatedAt: category.updatedAt,
-        })
+        this.mapToCategoryModel(category)
     );
   };
 
@@ -58,14 +44,7 @@ export class CategoryRepository implements ICategoryRepository {
 
     if (!category) return null;
 
-    return new CategoryModel({
-      id: category.id,
-      nome: category.nome,
-      descricao: category.descricao ?? undefined,
-      cor: category.cor ?? undefined,
-      createdAt: category.createdAt,
-      updatedAt: category.updatedAt,
-    });
+    return this.mapToCategoryModel(category);
   };
 
   updateCategory = async (id: string, data: UpdateCategoryDTO): Promise<ICategoryModel> => {
@@ -78,17 +57,54 @@ export class CategoryRepository implements ICategoryRepository {
       },
     });
 
-    return new CategoryModel({
-      id: updated.id,
-      nome: updated.nome,
-      descricao: updated.descricao ?? undefined,
-      cor: updated.cor ?? undefined,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.mapToCategoryModel(updated);
   };
 
   deleteCategory = async (id: string): Promise<void> => {
     await this.prisma.category.delete({ where: { id } });
+  };
+
+  findCategoryByName = async (nome: string): Promise<ICategoryModel | null> => {
+    const category = await this.prisma.category.findUnique({
+      where: { nome },
+    });
+
+    if (!category) return null;
+    return this.mapToCategoryModel(category);
+  };
+
+  findCategoryByColor = async (cor: string): Promise<ICategoryModel | null> => {
+    const category = await this.prisma.category.findFirst({
+      where: { cor },
+    });
+
+    if (!category) return null;
+    return this.mapToCategoryModel(category);
+  };
+
+  countAllCategory = async (): Promise<number> => {
+    return await this.prisma.category.count();
+  };
+
+  countPeopleWithCategory = async (categoryId: string): Promise<number> => {
+    return await this.prisma.people.count({
+      where: {
+        categorias: {
+          some: { id: categoryId }
+        }
+      }
+    });
+  };
+
+  // Método auxiliar para evitar repetição de código
+  private readonly mapToCategoryModel = (category: any): CategoryModel => {
+    return new CategoryModel({
+      id: category.id,
+      nome: category.nome,
+      descricao: category.descricao ?? undefined,
+      cor: category.cor ?? undefined,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
+    });
   };
 }

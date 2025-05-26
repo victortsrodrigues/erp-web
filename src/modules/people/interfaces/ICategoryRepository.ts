@@ -8,4 +8,8 @@ export interface ICategoryRepository {
   findCategoryById(id: string): Promise<ICategoryModel | null>;
   updateCategory(id: string, data: UpdateCategoryDTO): Promise<ICategoryModel>;
   deleteCategory(id: string): Promise<void>;
+  findCategoryByName(nome: string): Promise<ICategoryModel | null>;
+  findCategoryByColor(cor: string): Promise<ICategoryModel | null>;
+  countAllCategory(): Promise<number>;
+  countPeopleWithCategory(categoryId: string): Promise<number>;
 }
